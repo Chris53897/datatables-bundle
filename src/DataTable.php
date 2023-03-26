@@ -33,7 +33,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DataTable
 {
-    const DEFAULT_OPTIONS = [
+    public const DEFAULT_OPTIONS = [
         'jQueryUI' => false,
         'pagingType' => 'full_numbers',
         'lengthMenu' => [[10, 25, 50, -1], [10, 25, 50, 'All']],
@@ -55,9 +55,9 @@ class DataTable
         'fixedHeader' => false,
     ];
 
-    const DEFAULT_TEMPLATE = '@DataTables/datatable_html.html.twig';
-    const SORT_ASCENDING = 'asc';
-    const SORT_DESCENDING = 'desc';
+    public const DEFAULT_TEMPLATE = '@DataTables/datatable_html.html.twig';
+    public const SORT_ASCENDING = 'asc';
+    public const SORT_DESCENDING = 'desc';
 
     protected ?AdapterInterface $adapter = null;
 
@@ -100,6 +100,8 @@ class DataTable
                                 array                              $options = [],
                                 Instantiator                       $instantiator = null)
     {
+        $this->eventDispatcher = $eventDispatcher;
+        $this->exporterManager = $exporterManager;
 
         $this->instantiator = $instantiator ?? new Instantiator();
 
@@ -152,7 +154,7 @@ class DataTable
         return $this;
     }
 
-    public function createAdapter(string $adapter, array $options = []): self
+    public function createAdapter(string $adapter, array $options = []): static
     {
         return $this->setAdapter($this->instantiator->getAdapter($adapter), $options);
     }
@@ -225,7 +227,7 @@ class DataTable
 
     public function isCallback(): bool
     {
-        return !(null === $this->state) && $this->state->isCallback();
+        return (null === $this->state) ? false : $this->state->isCallback();
     }
 
     public function handleRequest(Request $request): self
@@ -320,7 +322,7 @@ class DataTable
         return $this->options[$name] ?? null;
     }
 
-    public function setAdapter(AdapterInterface $adapter, array $options = null): self
+    public function setAdapter(AdapterInterface $adapter, array $options = null): static
     {
         if (null !== $options) {
             $adapter->configure($options);

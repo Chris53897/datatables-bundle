@@ -10,6 +10,13 @@ Nothing yet.
 - Add strong php types
 - Add language features from php 8.0
 
+## [0.7.1] - 2022-12-01
+### Fixed
+ - Handle inconsistency in infinite page lengths
+
+### Changed
+ - Drop support for PHP 7
+
 ## [0.7.0] - 2022-03-16
 ### Breaking
 - Move logic to make queries without limits to the relevant adapters (#257)

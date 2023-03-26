@@ -12,7 +12,9 @@ declare(strict_types=1);
 
 namespace Omines\DataTablesBundle\Adapter\Doctrine;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -41,9 +43,10 @@ class ORMAdapter extends AbstractAdapter
 
     protected ?EntityManager $manager;
 
-    protected \Doctrine\ORM\Mapping\ClassMetadata $metadata;
+    protected ClassMetadata $metadata;
 
-    private int $hydrationMode;
+    /** @var AbstractQuery::HYDRATE_*|string|null */
+    private $hydrationMode;
 
     /** @var QueryBuilderProcessorInterface[] */
     private array $queryBuilderProcessors;

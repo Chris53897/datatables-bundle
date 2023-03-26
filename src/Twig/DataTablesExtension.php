@@ -14,8 +14,10 @@ namespace Omines\DataTablesBundle\Twig;
 
 use Omines\DataTablesBundle\DataTable;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class DataTablesExtension extends \Twig\Extension\AbstractExtension
+class DataTablesExtension extends AbstractExtension
 {
     /**
      * DataTablesExtension constructor.
@@ -24,7 +26,7 @@ class DataTablesExtension extends \Twig\Extension\AbstractExtension
     {}
 
     /**
-     * {@inheritdoc}
+     * @return TwigFunction[]
      */
     public function getFunctions(): array
     {

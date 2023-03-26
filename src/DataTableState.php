@@ -75,6 +75,11 @@ class DataTableState
         $this->start = (int) $parameters->get('start', $this->start);
         $this->length = (int) $parameters->get('length', $this->length);
 
+        // DataTables insists on using -1 for infinity
+        if ($this->length < 1) {
+            $this->length = null;
+        }
+
         $search = $parameters->all()['search'] ?? [];
         $this->setGlobalSearch($search['value'] ?? $this->globalSearch);
 
@@ -149,7 +154,7 @@ class DataTableState
 
     public function setLength(?int $length): self
     {
-        if ($length < 1) {
+        if (is_integer($length) && $length < 1) {
             @trigger_error(sprintf('Calling the "%s::setLength()" method with a length less than 1 is deprecated since version 0.7 of this bundle. If you need to unrestrict the amount of records returned, pass null instead.', self::class), \E_USER_DEPRECATED);
             $length = null;
         }
@@ -208,5 +213,10 @@ class DataTableState
     public function getExporterName(): ?string
     {
         return $this->exporterName;
+    }
+
+    public function isExport(): bool
+    {
+        return null !== $this->exporterName;
     }
 }

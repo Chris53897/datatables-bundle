@@ -33,7 +33,7 @@ class FunctionalTest extends WebTestCase
         $this->client = self::createClient();
     }
 
-    public function testFrontend()
+    public function testFrontend(): void
     {
         $this->client->enableProfiler();
         $crawler = $this->client->request('GET', '/');
@@ -46,7 +46,7 @@ class FunctionalTest extends WebTestCase
         $this->assertEmpty($json->data);
     }
 
-    public function testPlainDataTable()
+    public function testPlainDataTable(): void
     {
         $json = $this->callDataTableUrl('/plain?_dt=persons&_init=true&draw=1&start=25&length=50&order[0][column]=0&order[0][dir]=desc');
 
@@ -65,11 +65,12 @@ class FunctionalTest extends WebTestCase
         $this->assertSame('FirstName94 &lt;img src=&quot;https://symfony.com/images/v5/logos/sf-positive.svg&quot;&gt; LastName94', $sample->fullName);
         $this->assertSame('<a href="http://localhost/employee/95">FirstName94 LastName94</a>', $sample->link);
 
-        $this->assertMatchesRegularExpression('#href="/employee/[0-9]+"#', $sample->buttons);
+        // Change when we drop old PHP versions and thus old PHPunit versions
+        $this->assertMatchesRegularExpression('#href="/employee/\d+"#', $sample->buttons);
         $this->assertSame('04-07-2016', $json->data[6]->employedSince);
     }
 
-    public function testTypeDataTable()
+    public function testTypeDataTable(): void
     {
         $json = $this->callDataTableUrl('/type?_dt=persons');
 
@@ -84,7 +85,7 @@ class FunctionalTest extends WebTestCase
         $this->assertSame(2, $json->recordsFiltered);
     }
 
-    public function testServiceDataTable()
+    public function testServiceDataTable(): void
     {
         $json = $this->callDataTableUrl('/service?_dt=persons&draw=2');
 
@@ -99,7 +100,7 @@ class FunctionalTest extends WebTestCase
         $this->assertSame('LastName24 (Company 4)', $json->data[0]->fullName);
     }
 
-    public function testCustomDataTable()
+    public function testCustomDataTable(): void
     {
         $json = $this->callDataTableUrl('/custom?_dt=dt&draw=2');
 
@@ -107,7 +108,7 @@ class FunctionalTest extends WebTestCase
         $this->assertStringStartsWith('Company ', $json->data[0]->company);
     }
 
-    public function testGroupedDataTable()
+    public function testGroupedDataTable(): void
     {
         $this->markTestSkipped('Group by functionality is currently not working correctly');
 
@@ -116,7 +117,7 @@ class FunctionalTest extends WebTestCase
         $this->assertStringStartsWith('Company ', $json->data[0]->company);
     }
 
-    public function testGrouped2DataTable()
+    public function testGrouped2DataTable(): void
     {
         $json = $this->callDataTableUrl('/grouped2?_dt=companies2&draw=2');
 
@@ -126,7 +127,7 @@ class FunctionalTest extends WebTestCase
     /**
      * @dataProvider translationProvider
      */
-    public function testTranslation(string $locale, string $languageProcessing, string $languageInfoFiltered)
+    public function testTranslation(string $locale, string $languageProcessing, string $languageInfoFiltered): void
     {
         $this->client->request('GET', sprintf('/%s/translation', $locale));
         $this->assertSuccessful($response = $this->client->getResponse());
@@ -150,7 +151,7 @@ class FunctionalTest extends WebTestCase
     /**
      * @dataProvider languageInCDNProvider
      */
-    public function testLanguageInCDN(string $locale)
+    public function testLanguageInCDN(string $locale): void
     {
         $this->client->request('GET', sprintf('/%s/translation?cdn', $locale));
         $this->assertSuccessful($response = $this->client->getResponse());
@@ -172,7 +173,7 @@ class FunctionalTest extends WebTestCase
     /**
      * @dataProvider languageNotInCDNProvider
      */
-    public function testLanguageNotInCDN(string $locale)
+    public function testLanguageNotInCDN(string $locale): void
     {
         $this->client->request('GET', sprintf('/%s/translation?cdn', $locale));
         $this->assertSuccessful($response = $this->client->getResponse());
@@ -199,7 +200,7 @@ class FunctionalTest extends WebTestCase
         return json_decode($response->getContent());
     }
 
-    private function assertSuccessful(Response $response)
+    private function assertSuccessful(Response $response): void
     {
         if (!$response->isSuccessful()) {
             if ($profile = $this->client->getProfile()) {

@@ -38,6 +38,7 @@ class TwigStringColumn extends TwigColumn
     protected function render(mixed $value, mixed $context): mixed
     {
         return $this->twig->render('@DataTables/Column/twig_string.html.twig', [
+            'column' => $this,
             'column_template' => $this->getTemplate(),
             'row' => $context,
             'value' => $value,

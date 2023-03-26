@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Omines\DataTablesBundle\Exporter;
 
 use Omines\DataTablesBundle\DataTable;
+use Omines\DataTablesBundle\Exception\UnknownDataTableExporterException;
 use Omines\DataTablesBundle\Exporter\Event\DataTableExporterResponseEvent;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,14 +37,14 @@ class DataTableExporterManager
     public function __construct(private DataTableExporterCollection $exporterCollection, private TranslatorInterface $translator)
     {}
 
-    public function setExporterName(string $exporterName): self
+    public function setExporterName(string $exporterName): static
     {
         $this->exporterName = $exporterName;
 
         return $this;
     }
 
-    public function setDataTable(DataTable $dataTable): self
+    public function setDataTable(DataTable $dataTable): static
     {
         $this->dataTable = $dataTable;
 
@@ -51,7 +52,7 @@ class DataTableExporterManager
     }
 
     /**
-     * @throws \Omines\DataTablesBundle\Exception\UnknownDataTableExporterException
+     * @throws UnknownDataTableExporterException
      */
     public function getResponse(): Response
     {

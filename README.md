@@ -3,9 +3,6 @@
 [![Total Downloads](https://poser.pugx.org/omines/datatables-bundle/downloads)](https://packagist.org/packages/omines/datatables-bundle)
 [![Latest Unstable Version](https://poser.pugx.org/omines/datatables-bundle/v/unstable)](//packagist.org/packages/omines/datatables-bundle)
 [![License](https://poser.pugx.org/omines/datatables-bundle/license)](https://packagist.org/packages/omines/datatables-bundle)
-[![Build Status](https://travis-ci.org/omines/datatables-bundle.svg?branch=master)](https://travis-ci.org/omines/datatables-bundle)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/omines/datatables-bundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/omines/datatables-bundle/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/omines/datatables-bundle/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/omines/datatables-bundle/?branch=master)
 
 This bundle provides convenient integration of the popular [DataTables](https://datatables.net/) jQuery library
 for realtime Ajax tables in your [Symfony](https://symfony.com/) 5.4+ or 6.0+ application.
@@ -24,6 +21,10 @@ choices like FOSElasticaBundle and Doctrine DBAL is possible.
 Unless you are highly confident your issue stems from a shortcoming of this bundle and needs the original developers
 to look at it, please [ask all questions on Stack Overflow](https://stackoverflow.com/search?q=datatables+omines). We
 simply don't have a lot of time to spare, so your questions will be answered faster and better over there.
+
+## FAQ
+
+- [Why is there no `DBALAdapter` bundled out of the box](https://github.com/omines/datatables-bundle/pull/275#issuecomment-1420600416)?
 
 ## Contributing
 

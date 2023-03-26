@@ -27,11 +27,12 @@ class DataTableExporterCollectionTest extends KernelTestCase
         static::bootKernel();
     }
 
-    public function testUnknownExporter()
+    public function testUnknownExporter(): void
     {
         $this->expectException(UnknownDataTableExporterException::class);
-        static::getContainer()
+        $this->getContainer()
             ->get('Omines\DataTablesBundle\Exporter\DataTableExporterCollection')
-            ->getByName('unknown-exporter');
+            ->getByName('unknown-exporter')
+        ;
     }
 }

@@ -12,9 +12,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Exporter;
 
+use Omines\DataTablesBundle\Exception\InvalidArgumentException;
 use Omines\DataTablesBundle\Exporter\DataTableExporterCollection;
 use Omines\DataTablesBundle\Exporter\DataTableExporterManager;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\DataCollectorTranslator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -24,10 +26,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DataTableExporterManagerTest extends TestCase
 {
-    public function testTranslatorInjection()
+    public function testTranslatorInjection(): void
     {
         $exporterCollectionMock = $this->createMock(DataTableExporterCollection::class);
 
-        static::assertInstanceOf(DataTableExporterManager::class, (new DataTableExporterManager($exporterCollectionMock, $this->createMock(TranslatorInterface::class))));;
+        static::expectException(\TypeError::class);
+        new DataTableExporterManager($exporterCollectionMock, null);
+
+        static::expectException(InvalidArgumentException::class);
+        new DataTableExporterManager($exporterCollectionMock, $this->createMock(DataCollectorTranslator::class));
+
+        static::assertInstanceOf(DataTableExporterManager::class, new DataTableExporterManager($exporterCollectionMock, $this->createMock(TranslatorInterface::class)));
     }
 }

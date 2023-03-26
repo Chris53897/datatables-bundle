@@ -41,6 +41,7 @@ class TwigColumn extends AbstractColumn
         return $this->twig->render($this->getTemplate(), [
             'row' => $context,
             'value' => $value,
+            'column' => $this,
         ]);
     }
 

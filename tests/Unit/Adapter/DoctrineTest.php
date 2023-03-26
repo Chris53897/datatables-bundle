@@ -25,7 +25,6 @@ use Omines\DataTablesBundle\Exporter\DataTableExporterManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
-use TypeError;
 
 /**
  * DoctrineTest.
@@ -34,7 +33,7 @@ use TypeError;
  */
 class DoctrineTest extends TestCase
 {
-    public function testSearchCriteriaProvider()
+    public function testSearchCriteriaProvider(): void
     {
         $table = new DataTable($this->createMock(EventDispatcher::class), $this->createMock(DataTableExporterManager::class));
         $table
@@ -52,9 +51,7 @@ class DoctrineTest extends TestCase
         $qb = $this->createMock(QueryBuilder::class);
         $qb
             ->method('expr')
-            ->willReturnCallback(function () {
-                return new Query\Expr();
-            });
+            ->will($this->returnCallback(function () { return new Query\Expr(); }));
 
         /* @var QueryBuilder $qb */
         (new SearchCriteriaProvider())->process($qb, $state);
@@ -63,15 +60,27 @@ class DoctrineTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testORMAdapterRequiresDependency()
+    public function testORMAdapterRequiresDependency(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('doctrine/doctrine-bundle');
 
-        (new ORMAdapter());
+        new ORMAdapter();
     }
 
-    public function testInvalidFieldThrows()
+    public function testInvalidQueryProcessorThrows(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Provider must be a callable or implement QueryBuilderProcessorInterface');
+
+        (new ORMAdapter($this->createMock(ManagerRegistry::class)))
+            ->configure([
+                'entity' => 'bar',
+                'query' => ['foo'],
+            ]);
+    }
+
+    public function testInvalidFieldThrows(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Field name 'invalid' must consist at least of an alias and a field");
@@ -82,7 +91,7 @@ class DoctrineTest extends TestCase
         $column->initialize('foo', 0, ['field' => 'invalid'], $this->createMock(DataTable::class));
 
         $mock = new class($this->createMock(ManagerRegistry::class)) extends ORMAdapter {
-            public function foo($query, $column): ?string
+            public function foo($query, $column)
             {
                 return $this->mapPropertyPath($query, $column);
             }

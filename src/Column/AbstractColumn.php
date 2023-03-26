@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace Omines\DataTablesBundle\Column;
 
 use Omines\DataTablesBundle\DataTable;
+use Omines\DataTablesBundle\DataTableState;
 use Omines\DataTablesBundle\Filter\AbstractFilter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -59,7 +60,7 @@ abstract class AbstractColumn
     {
         $data = $this->getData();
         if (is_callable($data)) {
-            $value = call_user_func($data, $context, $value);
+            $value = call_user_func($data, $context, $value, $this);
         } elseif (null === $value) {
             $value = $data;
         }
@@ -77,7 +78,7 @@ abstract class AbstractColumn
         if (is_string($render = $this->options['render'])) {
             return sprintf($render, $value);
         } elseif (is_callable($render)) {
-            return call_user_func($render, $value, $context);
+            return call_user_func($render, $value, $context, $this);
         }
 
         return $value;
@@ -231,6 +232,15 @@ abstract class AbstractColumn
         return $this->dataTable;
     }
 
+    public function getState(): DataTableState
+    {
+        return $this->dataTable->getState();
+    }
+
+    /**
+     * @param mixed $value
+     * @return $this
+     */
     public function setOption(string $name, mixed $value): self
     {
         $this->options[$name] = $value;

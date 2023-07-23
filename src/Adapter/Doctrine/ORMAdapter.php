@@ -153,9 +153,6 @@ class ORMAdapter extends AbstractAdapter
         return $aliases;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function mapPropertyPath(AdapterQuery $query, AbstractColumn $column): ?string
     {
         return $this->mapFieldToPropertyPath($column->getField(), $query->get('aliases'));
@@ -185,9 +182,9 @@ class ORMAdapter extends AbstractAdapter
         $event = new ORMAdapterQueryEvent($query);
         $state->getDataTable()->getEventDispatcher()->dispatch($event, ORMAdapterEvents::PRE_QUERY);
 
-        foreach ($query->iterate([], $this->hydrationMode) as $result) {
+        foreach ($query->toIterable([], $this->hydrationMode) as $result) {
             yield $entity = array_values($result)[0];
-            if (Query::HYDRATE_OBJECT === $this->hydrationMode) {
+            if (AbstractQuery::HYDRATE_OBJECT === $this->hydrationMode) {
                 $this->manager->detach($entity);
             }
         }

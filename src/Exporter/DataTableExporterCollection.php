@@ -25,7 +25,7 @@ class DataTableExporterCollection
     /**
      * DataTableExporterCollection constructor.
      *
-     * @var \Traversable $exporters The available exporters
+     * @param \Traversable $exporters The available exporters
      */
     public function __construct(private \Traversable $exporters)
     {}

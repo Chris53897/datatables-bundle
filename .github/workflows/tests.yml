@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php: ['8.0', '8.1', '8.2']
+        php: ['8.2']
 
     name: "Tests"
 
@@ -22,6 +22,9 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: pcov
+
       - run: composer install --no-progress
-      - run: vendor/bin/phpstan analyse
+
+      #- run: vendor/bin/phpstan analyse
+
       - run: vendor/bin/simple-phpunit

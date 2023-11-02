@@ -18,6 +18,7 @@ class ChoiceFilter extends AbstractFilter
 {
     protected ?string $placeholder = null;
 
+    /** @var array<string, string> */
     protected array $choices = [];
 
     protected function configureOptions(OptionsResolver $resolver): static
@@ -42,6 +43,9 @@ class ChoiceFilter extends AbstractFilter
         return $this->placeholder;
     }
 
+    /**
+     * @return string[]
+     */
     public function getChoices(): array
     {
         return $this->choices;

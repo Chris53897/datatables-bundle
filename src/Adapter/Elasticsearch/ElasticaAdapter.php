@@ -26,13 +26,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ElasticaAdapter extends AbstractAdapter
 {
+    /** @var array<string, mixed> */
     private array $clientSettings = [];
 
+    /** @var array<string, mixed> */
     private array $indices = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function configure(array $options): void
     {
         $resolver = new OptionsResolver();
@@ -57,9 +56,6 @@ class ElasticaAdapter extends AbstractAdapter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function mapPropertyPath(AdapterQuery $query, AbstractColumn $column): ?string
     {
         return "[{$column->getField()}]";
@@ -106,7 +102,7 @@ class ElasticaAdapter extends AbstractAdapter
         return $q;
     }
 
-    protected function applyOrdering(\Elastica\Query $query, DataTableState $state): void
+    protected function applyOrdering(\Elastica\Query $query, DataTableState $state)
     {
         foreach ($state->getOrderBy() as list($column, $direction)) {
             /** @var AbstractColumn $column */
@@ -116,7 +112,7 @@ class ElasticaAdapter extends AbstractAdapter
         }
     }
 
-    protected function configureOptions(OptionsResolver $resolver): void
+    protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setDefaults([

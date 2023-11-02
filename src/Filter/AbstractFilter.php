@@ -17,11 +17,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 abstract class AbstractFilter
 {
     protected string $template_html;
-
     protected string $template_js;
-
     protected string $operator;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function set(array $options): void
     {
         $resolver = new OptionsResolver();

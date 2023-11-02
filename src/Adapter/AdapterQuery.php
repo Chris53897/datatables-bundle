@@ -23,19 +23,15 @@ use Omines\DataTablesBundle\DataTableState;
 class AdapterQuery
 {
     private ?int $totalRows;
-
     private ?int $filteredRows;
-
     private ?string $identifierPropertyPath = null;
 
     /** @var array<string, mixed> */
     private array $data;
 
-    /**
-     * AdapterQuery constructor.
-     */
-    public function __construct(private DataTableState $state)
-    {}
+    public function __construct(private readonly DataTableState $state)
+    {
+    }
 
     public function getState(): DataTableState
     {
@@ -47,7 +43,7 @@ class AdapterQuery
         return $this->totalRows;
     }
 
-    public function setTotalRows(?int $totalRows): self
+    public function setTotalRows(?int $totalRows): static
     {
         $this->totalRows = $totalRows;
 
@@ -59,7 +55,7 @@ class AdapterQuery
         return $this->filteredRows;
     }
 
-    public function setFilteredRows(?int $filteredRows): self
+    public function setFilteredRows(?int $filteredRows): static
     {
         $this->filteredRows = $filteredRows;
 
@@ -71,13 +67,18 @@ class AdapterQuery
         return $this->identifierPropertyPath;
     }
 
-    public function setIdentifierPropertyPath(?string $identifierPropertyPath): self
+    public function setIdentifierPropertyPath(?string $identifierPropertyPath): static
     {
         $this->identifierPropertyPath = $identifierPropertyPath;
 
         return $this;
     }
 
+    /**
+     * @template T
+     * @param T $default
+     * @return T|mixed
+     */
     public function get(string $key, mixed $default = null): mixed
     {
         return $this->data[$key] ?? $default;

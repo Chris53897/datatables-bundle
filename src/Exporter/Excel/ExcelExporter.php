@@ -27,9 +27,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class ExcelExporter implements DataTableExporterInterface
 {
     /**
-     * {@inheritdoc}
-     *
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @param mixed[] $columnNames
      */
     public function export(array $columnNames, \Iterator $data): \SplFileInfo
     {
@@ -61,8 +59,6 @@ class ExcelExporter implements DataTableExporterInterface
 
     /**
      * Sets the columns width to automatically fit the contents.
-     *
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     private function autoSizeColumnWidth(Worksheet $sheet): void
     {
@@ -71,9 +67,6 @@ class ExcelExporter implements DataTableExporterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName(): string
     {
         return 'excel';

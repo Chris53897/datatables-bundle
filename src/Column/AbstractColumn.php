@@ -28,14 +28,15 @@ abstract class AbstractColumn
     private static array $resolversByClass = [];
 
     private string $name;
-
     private int $index;
-
     private DataTable $dataTable;
 
     /** @var array<string, mixed> */
     protected array $options;
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function initialize(string $name, int $index, array $options, DataTable $dataTable): void
     {
         $this->name = $name;
@@ -53,8 +54,8 @@ abstract class AbstractColumn
     /**
      * The transform function is responsible for converting column-appropriate input to a datatables-usable type.
      *
-     * @param mixed|null $value The single value of the column, if mapping makes it possible to derive one
-     * @param mixed|null $context All relevant data of the entire row
+     * @param mixed $value The single value of the column, if mapping makes it possible to derive one
+     * @param mixed $context All relevant data of the entire row
      */
     public function transform(mixed $value = null, mixed $context = null): mixed
     {
@@ -71,6 +72,7 @@ abstract class AbstractColumn
     /**
      * Apply final modifications before rendering to result.
      *
+     * @param mixed $value The raw data pending rendering
      * @param mixed $context All relevant data of the entire row
      */
     protected function render(mixed $value, mixed $context): mixed
@@ -84,11 +86,6 @@ abstract class AbstractColumn
         return $value;
     }
 
-    /**
-     * The normalize function is responsible for converting parsed and processed data to a datatables-appropriate type.
-     *
-     * @param mixed $value The single value of the column
-     */
     abstract public function normalize(mixed $value): mixed;
 
     protected function configureOptions(OptionsResolver $resolver): static
@@ -110,7 +107,6 @@ abstract class AbstractColumn
                 'leftExpr' => null,
                 'operator' => '=',
                 'rightExpr' => null,
-                'searchIn' => null,
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -127,7 +123,6 @@ abstract class AbstractColumn
             ->setAllowedTypes('operator', ['string'])
             ->setAllowedTypes('leftExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('rightExpr', ['null', 'string', 'callable'])
-            ->setAllowedTypes('searchIn', ['null', 'callable'])
         ;
 
         return $this;
@@ -143,7 +138,7 @@ abstract class AbstractColumn
         return $this->name;
     }
 
-    public function getLabel(): ?string
+    public function getLabel(): string
     {
         return $this->options['label'] ?? "{$this->dataTable->getName()}.columns.{$this->getName()}";
     }
@@ -180,7 +175,7 @@ abstract class AbstractColumn
 
     public function getFilter(): ?AbstractFilter
     {
-        return $this->options['filter'];
+        return $this->options['filter'] ?? null;
     }
 
     public function getOrderField(): ?string
@@ -193,7 +188,7 @@ abstract class AbstractColumn
         return $this->options['globalSearchable'] ?? $this->isSearchable();
     }
 
-    public function getLeftExpr(): ?string
+    public function getLeftExpr(): mixed
     {
         $leftExpr = $this->options['leftExpr'];
         if (null === $leftExpr) {
@@ -206,7 +201,7 @@ abstract class AbstractColumn
         return $leftExpr;
     }
 
-    public function getRightExpr($value): mixed
+    public function getRightExpr(mixed $value): mixed
     {
         $rightExpr = $this->options['rightExpr'];
         if (null === $rightExpr) {
@@ -219,21 +214,6 @@ abstract class AbstractColumn
         return $rightExpr;
     }
 
-    public function getSearchIn($value): mixed
-    {
-        $searchIn = $this->options['searchIn'];
-
-        if (null === $searchIn) {
-            return null;
-        }
-
-        if (is_callable($searchIn)) {
-            return call_user_func($searchIn, $this->options, $value);
-        }
-
-        return $searchIn;
-    }
-
     public function getOperator(): string
     {
         return $this->options['operator'];
@@ -241,7 +221,7 @@ abstract class AbstractColumn
 
     public function getClassName(): ?string
     {
-        return $this->options['className'];
+        return $this->options['className'] ?? null;
     }
 
     public function getDataTable(): DataTable
@@ -254,7 +234,7 @@ abstract class AbstractColumn
         return $this->dataTable->getState();
     }
 
-    public function setOption(string $name, mixed $value): self
+    public function setOption(string $name, mixed $value): static
     {
         $this->options[$name] = $value;
 

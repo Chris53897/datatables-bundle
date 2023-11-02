@@ -24,9 +24,6 @@ use Omines\DataTablesBundle\DataTableState;
  */
 class SearchCriteriaProvider implements QueryBuilderProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(QueryBuilder $queryBuilder, DataTableState $state): void
     {
         $this->processSearchColumns($queryBuilder, $state);
@@ -59,17 +56,8 @@ class SearchCriteriaProvider implements QueryBuilderProcessorInterface
             $comparisons = $expr->orX();
             foreach ($state->getDataTable()->getColumns() as $column) {
                 if ($column->isGlobalSearchable() && !empty($column->getField()) && $column->isValidForSearch($globalSearch)) {
-                    
-                    if($searchIn = $column->getSearchIn($globalSearch))
-                    {
-                        $comparisons->add($expr->in($column->getLeftExpr(), $searchIn));
-                    }
-                    else
-                    {
-                        # default
-                        $comparisons->add(new Comparison($column->getLeftExpr(), $column->getOperator(),
+                    $comparisons->add(new Comparison($column->getLeftExpr(), $column->getOperator(),
                         $expr->literal($column->getRightExpr($globalSearch))));
-                    }
                 }
             }
             $queryBuilder->andWhere($comparisons);

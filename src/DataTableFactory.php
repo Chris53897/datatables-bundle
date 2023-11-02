@@ -22,16 +22,25 @@ class DataTableFactory
     /** @var array<string, DataTableTypeInterface> */
     protected array $resolvedTypes = [];
 
-    /**
-     * DataTableFactory constructor.
-     */
-    public function __construct(protected array                      $config,
-                                protected DataTableRendererInterface $renderer,
-                                protected Instantiator               $instantiator,
-                                protected EventDispatcherInterface   $eventDispatcher,
-                                protected DataTableExporterManager   $exporterManager)
-    {}
+    /** @var array<string, mixed> */
+    protected array $config;
 
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function __construct(
+        array $config,
+        protected readonly DataTableRendererInterface $renderer,
+        protected readonly Instantiator $instantiator,
+        protected readonly EventDispatcherInterface $eventDispatcher,
+        protected readonly DataTableExporterManager $exporterManager,
+    ) {
+        $this->config = $config;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
     public function create(array $options = []): DataTable
     {
         $config = $this->config;
@@ -46,7 +55,10 @@ class DataTableFactory
         ;
     }
 
-
+    /**
+     * @param array<string, mixed> $typeOptions
+     * @param array<string, mixed> $options
+     */
     public function createFromType(DataTableTypeInterface|string $type, array $typeOptions = [], array $options = []): DataTable
     {
         $dataTable = $this->create($options);

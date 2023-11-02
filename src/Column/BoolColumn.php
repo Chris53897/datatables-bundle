@@ -21,9 +21,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BoolColumn extends AbstractColumn
 {
-    /**
-     * {@inheritdoc}
-     */
     public function normalize(mixed $value): string
     {
         if (null === $value) {
@@ -33,9 +30,6 @@ class BoolColumn extends AbstractColumn
         return ((bool) $value) ? $this->getTrueValue() : $this->getFalseValue();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configureOptions(OptionsResolver $resolver): static
     {
         parent::configureOptions($resolver);

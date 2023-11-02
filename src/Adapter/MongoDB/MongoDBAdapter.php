@@ -38,9 +38,6 @@ class MongoDBAdapter extends AbstractAdapter
 
     private array $filters;
 
-    /**
-     * {@inheritdoc}
-     */
     public function configure(array $options): void
     {
         $resolver = new OptionsResolver();
@@ -51,9 +48,6 @@ class MongoDBAdapter extends AbstractAdapter
         $this->filters = $options['filters'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function prepareQuery(AdapterQuery $query): void
     {
         foreach ($query->getState()->getDataTable()->getColumns() as $column) {
@@ -65,16 +59,13 @@ class MongoDBAdapter extends AbstractAdapter
         $query->setTotalRows($this->collection->count());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function mapPropertyPath(AdapterQuery $query, AbstractColumn $column): ?string
     {
         return '[' . implode('][', explode('.', $column->getField())) . ']';
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Traversable<BSONDocument>
      */
     protected function getResults(AdapterQuery $query): \Traversable
     {
@@ -132,7 +123,7 @@ class MongoDBAdapter extends AbstractAdapter
         return $options;
     }
 
-    protected function configureOptions(OptionsResolver $resolver): void
+    protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver
             ->setDefaults([

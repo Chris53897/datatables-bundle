@@ -25,26 +25,28 @@ use Omines\DataTablesBundle\DataTableState;
  */
 class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
 {
-    private string $entityName;
-
+    private EntityManagerInterface $em;
+    private ClassMetadata $metadata;
     private string $entityShortName;
 
+    /** @var class-string */
+    private string $entityName;
+
+    /** @var array<string, string[]> */
     private array $selectColumns = [];
 
+    /** @var array<string, string[]> */
     private array $joins = [];
 
-    /**
-     * AutomaticQueryBuilder constructor.
-     */
-    public function __construct(private EntityManagerInterface $em, private ClassMetadata $metadata)
+    public function __construct(EntityManagerInterface $em, ClassMetadata $metadata)
     {
+        $this->em = $em;
+        $this->metadata = $metadata;
+
         $this->entityName = $this->metadata->getName();
         $this->entityShortName = mb_strtolower($this->metadata->getReflectionClass()->getShortName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(QueryBuilder $builder, DataTableState $state): void
     {
         if (empty($this->selectColumns) && empty($this->joins)) {
@@ -101,7 +103,7 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         }
     }
 
-    private function addSelectColumn($columnTableName, $data): static
+    private function addSelectColumn(string $columnTableName, string $data): void
     {
         if (isset($this->selectColumns[$columnTableName])) {
             if (!in_array($data, $this->selectColumns[$columnTableName], true)) {
@@ -110,15 +112,13 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         } else {
             $this->selectColumns[$columnTableName][] = $data;
         }
-
-        return $this;
     }
 
-    private function getIdentifier(ClassMetadata $metadata): ?string
+    private function getIdentifier(ClassMetadata $metadata): string
     {
         $identifiers = $metadata->getIdentifierFieldNames();
 
-        return array_shift($identifiers);
+        return array_shift($identifiers) ?? throw new \LogicException(sprintf('Class %s has no identifiers', $metadata->getName()));
     }
 
     private function setIdentifierFromAssociation(string $association, string $key, ClassMetadata $metadata): ClassMetadata
@@ -132,7 +132,7 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
         return $targetMetadata;
     }
 
-    private function setSelectFrom(QueryBuilder $qb): static
+    private function setSelectFrom(QueryBuilder $qb): void
     {
         foreach ($this->selectColumns as $key => $value) {
             if (false === empty($key)) {
@@ -141,16 +141,12 @@ class AutomaticQueryBuilder implements QueryBuilderProcessorInterface
                 $qb->addSelect($value);
             }
         }
-
-        return $this;
     }
 
-    private function setJoins(QueryBuilder $qb): static
+    private function setJoins(QueryBuilder $qb): void
     {
         foreach ($this->joins as $key => $value) {
             $qb->{$value['type']}($key, $value['alias']);
         }
-
-        return $this;
     }
 }

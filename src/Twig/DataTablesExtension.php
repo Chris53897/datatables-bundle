@@ -19,11 +19,9 @@ use Twig\TwigFunction;
 
 class DataTablesExtension extends AbstractExtension
 {
-    /**
-     * DataTablesExtension constructor.
-     */
-    public function __construct(protected TranslatorInterface $translator)
-    {}
+    public function __construct(protected readonly TranslatorInterface $translator)
+    {
+    }
 
     /**
      * @return TwigFunction[]
@@ -31,7 +29,7 @@ class DataTablesExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new \Twig\TwigFunction('datatable_settings', function (DataTable $dataTable) {
+            new TwigFunction('datatable_settings', function (DataTable $dataTable) {
                 return json_encode([
                     'name' => $dataTable->getName(),
                     'method' => $dataTable->getMethod(),
@@ -44,7 +42,10 @@ class DataTablesExtension extends AbstractExtension
         ];
     }
 
-    private function getLanguageSettings(DataTable $dataTable): array
+    /**
+     * @return array<string, string|array<string, mixed>>
+     */
+    private function getLanguageSettings(DataTable $dataTable)
     {
         if ($dataTable->isLanguageFromCDN() && null !== ($cdnFile = $this->getCDNLanguageFile())) {
             return ['url' => '//cdn.datatables.net/plug-ins/1.10.15/i18n/' . $cdnFile];
@@ -79,13 +80,18 @@ class DataTablesExtension extends AbstractExtension
 
     /**
      * Returns the name of the extension.
+     *
+     * @return string The extension name
      */
-    public function getName(): string
+    public function getName()
     {
         return 'DataTablesBundle';
     }
 
-    private function getCDNLanguageFile(): ?string
+    /**
+     * @return string|null
+     */
+    private function getCDNLanguageFile()
     {
         $file = $this->translator->trans('file', [], 'DataTablesCDN');
 

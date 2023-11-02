@@ -7,6 +7,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Add strong php types
 - Add language features from php 8.0
 
+## 0.8.0 - in RC
+### Breaking
+ - All interfaces and classes are now fully typed, this will likely require modifications in any custom extensions
+ - EOL: Drop PHP <8.1 support
+ - EOL: Drop Symfony <6.3 support
+
+### Added
+ - Support Symfony 7.0 in dependencies
+
+### Changed
+ - Fix deprecations
+ - Add parameter and return types all over for static analysis purposes
+ - Codebase is now at PHPstan level 8
+
 ## [0.7.2] - 2023-04-24
 ### Fixed
  - #299 Fix merging of api-state and persisted state (#300)
@@ -17,7 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Handle inconsistency in infinite page lengths
 
 ### Changed
- - Drop support for PHP 7
+ - EOL: Drop support for PHP 7
 
 ## [0.7.0] - 2022-03-16
 ### Breaking

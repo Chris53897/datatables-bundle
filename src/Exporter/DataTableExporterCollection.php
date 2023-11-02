@@ -22,18 +22,19 @@ use Omines\DataTablesBundle\Exception\UnknownDataTableExporterException;
  */
 class DataTableExporterCollection
 {
+    /** @var \Traversable<DataTableExporterInterface> */
+    private \Traversable $exporters;
+
     /**
-     * DataTableExporterCollection constructor.
-     *
-     * @param \Traversable $exporters The available exporters
+     * @param \Traversable<DataTableExporterInterface> $exporters
      */
-    public function __construct(private \Traversable $exporters)
-    {}
+    public function __construct(\Traversable $exporters)
+    {
+        $this->exporters = $exporters;
+    }
 
     /**
      * Finds a DataTable exporter that matches the given name.
-     *
-     * @throws UnknownDataTableExporterException
      */
     public function getByName(string $name): DataTableExporterInterface
     {

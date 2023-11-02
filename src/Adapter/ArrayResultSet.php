@@ -16,41 +16,36 @@ namespace Omines\DataTablesBundle\Adapter;
  * ArrayResultSet.
  *
  * @author Niels Keurentjes <niels.keurentjes@omines.com>
+ *
+ * @phpstan-type Row array<string, mixed>
  */
 class ArrayResultSet implements ResultSetInterface
 {
+    /** @var Row[] */
+    private array $data;
     private int $totalRows;
-
     private int $totalFilteredRows;
 
     /**
-     * ArrayResultSet constructor.
+     * @param Row[] $data
      */
-    public function __construct(private array $data, int $totalRows = null, int $totalFilteredRows = null)
+    public function __construct(array $data, int $totalRows = null, int $totalFilteredRows = null)
     {
+        $this->data = $data;
         $this->totalRows = $totalRows ?? count($data);
         $this->totalFilteredRows = $totalFilteredRows ?? $this->totalRows;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTotalRecords(): int
     {
         return $this->totalRows;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTotalDisplayRecords(): int
     {
         return $this->totalFilteredRows;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getData(): \Iterator
     {
         return new \ArrayIterator($this->data);

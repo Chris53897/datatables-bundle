@@ -23,22 +23,16 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 class ArrayAdapter implements AdapterInterface
 {
+    /** @var mixed[] */
     private array $data = [];
-
     private PropertyAccessor $accessor;
 
-    /**
-     * {@inheritdoc}
-     */
     public function configure(array $options): void
     {
         $this->data = $options;
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getData(DataTableState $state): ResultSetInterface
     {
         // very basic implementation of sorting
@@ -76,6 +70,11 @@ class ArrayAdapter implements AdapterInterface
         return new ArrayResultSet($page, count($this->data), count($data));
     }
 
+    /**
+     * @param mixed[][] $data
+     * @param array<string, string> $map
+     * @return \Generator<mixed[]>
+     */
     protected function processData(DataTableState $state, array $data, array $map): \Generator
     {
         $transformer = $state->getDataTable()->getTransformer();
@@ -90,6 +89,11 @@ class ArrayAdapter implements AdapterInterface
         }
     }
 
+    /**
+     * @param mixed[] $result
+     * @param array<string, string> $map
+     * @return mixed[]|null
+     */
     protected function processRow(DataTableState $state, array $result, array $map, string $search): ?array
     {
         $row = [];

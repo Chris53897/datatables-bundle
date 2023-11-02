@@ -66,19 +66,18 @@ class DataTable
 
     /** @var array<string, AbstractColumn> */
     protected array $columnsByName = [];
-
+    protected EventDispatcherInterface $eventDispatcher;
+    protected DataTableExporterManager $exporterManager;
     protected string $method = Request::METHOD_POST;
 
+    /** @var array<string, mixed> */
     protected array $options;
-
     protected bool $languageFromCDN = true;
-
     protected string $name = 'dt';
-
     protected string $persistState = 'fragment';
-
     protected string $template = self::DEFAULT_TEMPLATE;
 
+    /** @var array<string, mixed> */
     protected array $templateParams = [];
 
     /** @var callable */
@@ -87,18 +86,13 @@ class DataTable
     protected string $translationDomain = 'messages';
 
     private DataTableRendererInterface $renderer;
-
     private ?DataTableState $state = null;
-
     private Instantiator $instantiator;
 
     /**
-     * DataTable constructor.
+     * @param array<string, mixed> $options
      */
-    public function __construct(protected EventDispatcherInterface $eventDispatcher,
-                                protected DataTableExporterManager $exporterManager,
-                                array                              $options = [],
-                                Instantiator                       $instantiator = null)
+    public function __construct(EventDispatcherInterface $eventDispatcher, DataTableExporterManager $exporterManager, array $options = [], Instantiator $instantiator = null)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->exporterManager = $exporterManager;
@@ -110,6 +104,9 @@ class DataTable
         $this->options = $resolver->resolve($options);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function add(string $name, string $type, array $options = []): static
     {
         // Ensure name is unique
@@ -137,14 +134,18 @@ class DataTable
      *
      * @return $this
      */
-    public function addEventListener(string $eventName, callable $listener, int $priority = 0): self
+    public function addEventListener(string $eventName, callable $listener, int $priority = 0): static
     {
         $this->eventDispatcher->addListener($eventName, $listener, $priority);
 
         return $this;
     }
 
-    public function addOrderBy(int|string|AbstractColumn $column, string $direction = self::SORT_ASCENDING): static
+    /**
+     * @param int|string|AbstractColumn $column
+     * @return $this
+     */
+    public function addOrderBy($column, string $direction = self::SORT_ASCENDING)
     {
         if (!$column instanceof AbstractColumn) {
             $column = is_int($column) ? $this->getColumn($column) : $this->getColumnByName((string) $column);
@@ -154,6 +155,9 @@ class DataTable
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function createAdapter(string $adapter, array $options = []): static
     {
         return $this->setAdapter($this->instantiator->getAdapter($adapter), $options);
@@ -161,7 +165,7 @@ class DataTable
 
     public function getAdapter(): AdapterInterface
     {
-        return $this->adapter;
+        return $this->adapter ?? throw new InvalidConfigurationException('DataTable has no adapter');
     }
 
     public function getColumn(int $index): AbstractColumn
@@ -215,9 +219,14 @@ class DataTable
         return $this->persistState;
     }
 
-    public function getState(): ?DataTableState
+    public function getState(): DataTableState
     {
-        return $this->state;
+        return $this->state ?? throw new InvalidStateException('The DataTable does not know its state yet, did you call handleRequest?');
+    }
+
+    public function hasState(): bool
+    {
+        return null !== $this->state;
     }
 
     public function getTranslationDomain(): string
@@ -230,7 +239,7 @@ class DataTable
         return (null === $this->state) ? false : $this->state->isCallback();
     }
 
-    public function handleRequest(Request $request): self
+    public function handleRequest(Request $request): static
     {
         switch ($this->getMethod()) {
             case Request::METHOD_GET:
@@ -254,26 +263,24 @@ class DataTable
 
     public function getResponse(): Response
     {
-        if (null === $this->state) {
-            throw new InvalidStateException('The DataTable does not know its state yet, did you call handleRequest?');
-        }
+        $state = $this->getState();
 
         // Server side export
-        if (null !== $this->state->getExporterName()) {
+        if (null !== $state->getExporterName()) {
             return $this->exporterManager
                 ->setDataTable($this)
-                ->setExporterName($this->state->getExporterName())
+                ->setExporterName($state->getExporterName())
                 ->getResponse();
         }
 
         $resultSet = $this->getResultSet();
         $response = [
-            'draw' => $this->state->getDraw(),
+            'draw' => $state->getDraw(),
             'recordsTotal' => $resultSet->getTotalRecords(),
             'recordsFiltered' => $resultSet->getTotalDisplayRecords(),
             'data' => iterator_to_array($resultSet->getData()),
         ];
-        if ($this->state->isInitial()) {
+        if ($state->isInitial()) {
             $response['options'] = $this->getInitialResponse();
             $response['template'] = $this->renderer->renderDataTable($this, $this->template, $this->templateParams);
         }
@@ -281,6 +288,9 @@ class DataTable
         return new JsonResponse($response);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function getInitialResponse(): array
     {
         return array_merge($this->getOptions(), [
@@ -304,7 +314,7 @@ class DataTable
             throw new InvalidStateException('No adapter was configured yet to retrieve data with. Call "createAdapter" or "setAdapter" before attempting to return data');
         }
 
-        return $this->adapter->getData($this->state);
+        return $this->adapter->getData($this->getState());
     }
 
     public function getTransformer(): ?callable
@@ -312,6 +322,9 @@ class DataTable
         return $this->transformer;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -322,6 +335,9 @@ class DataTable
         return $this->options[$name] ?? null;
     }
 
+    /**
+     * @param ?array<string, mixed> $options
+     */
     public function setAdapter(AdapterInterface $adapter, array $options = null): static
     {
         if (null !== $options) {
@@ -332,35 +348,35 @@ class DataTable
         return $this;
     }
 
-    public function setLanguageFromCDN(bool $languageFromCDN): self
+    public function setLanguageFromCDN(bool $languageFromCDN): static
     {
         $this->languageFromCDN = $languageFromCDN;
 
         return $this;
     }
 
-    public function setMethod(string $method): self
+    public function setMethod(string $method): static
     {
         $this->method = $method;
 
         return $this;
     }
 
-    public function setPersistState(string $persistState): self
+    public function setPersistState(string $persistState): static
     {
         $this->persistState = $persistState;
 
         return $this;
     }
 
-    public function setRenderer(DataTableRendererInterface $renderer): self
+    public function setRenderer(DataTableRendererInterface $renderer): static
     {
         $this->renderer = $renderer;
 
         return $this;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): static
     {
         if (empty($name)) {
             throw new InvalidArgumentException('DataTable name cannot be empty');
@@ -370,7 +386,10 @@ class DataTable
         return $this;
     }
 
-    public function setTemplate(string $template, array $parameters = []): self
+    /**
+     * @param array<string, mixed> $parameters
+     */
+    public function setTemplate(string $template, array $parameters = []): static
     {
         $this->template = $template;
         $this->templateParams = $parameters;
@@ -378,21 +397,27 @@ class DataTable
         return $this;
     }
 
-    public function setTranslationDomain(string $translationDomain): self
+    public function setTranslationDomain(string $translationDomain): static
     {
         $this->translationDomain = $translationDomain;
 
         return $this;
     }
 
-    public function setTransformer(callable $formatter): self
+    /**
+     * @return $this
+     */
+    public function setTransformer(callable $formatter)
     {
         $this->transformer = $formatter;
 
         return $this;
     }
 
-    protected function configureOptions(OptionsResolver $resolver): self
+    /**
+     * @return $this
+     */
+    protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(self::DEFAULT_OPTIONS);
 

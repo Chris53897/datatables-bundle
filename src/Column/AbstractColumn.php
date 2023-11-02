@@ -107,7 +107,7 @@ abstract class AbstractColumn
                 'leftExpr' => null,
                 'operator' => '=',
                 'rightExpr' => null,
-                'searchIn' => null,
+                'searchIn' => null,  # SRT
             ])
             ->setAllowedTypes('label', ['null', 'string'])
             ->setAllowedTypes('data', ['null', 'string', 'callable'])
@@ -124,7 +124,7 @@ abstract class AbstractColumn
             ->setAllowedTypes('operator', ['string'])
             ->setAllowedTypes('leftExpr', ['null', 'string', 'callable'])
             ->setAllowedTypes('rightExpr', ['null', 'string', 'callable'])
-            ->setAllowedTypes('searchIn', ['null', 'callable'])
+            ->setAllowedTypes('searchIn', ['null', 'callable'])  # SRT
         ;
 
         return $this;
@@ -203,6 +203,7 @@ abstract class AbstractColumn
         return $leftExpr;
     }
 
+    # SRT
     public function getSearchIn($value): mixed
     {
         $searchIn = $this->options['searchIn'];

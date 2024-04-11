@@ -84,8 +84,8 @@ class ColumnTest extends TestCase
     {
         $column = new BoolColumn();
         $column->initialize('test', 1, [
-             'trueValue' => 'yes',
-             'nullValue' => '<em>null</em>',
+            'trueValue' => 'yes',
+            'nullValue' => '<em>null</em>',
         ], $this->createDataTable());
 
         $this->assertSame('yes', $column->transform(5));
@@ -127,7 +127,7 @@ class ColumnTest extends TestCase
         $this->assertSame('684', $column->transform('684'));
 
         $this->assertFalse($column->isRaw());
-        $this->assertTrue($column->isValidForSearch("684"));
+        $this->assertTrue($column->isValidForSearch(684));
         $this->assertFalse($column->isValidForSearch('foo.bar'));
 
         // Forced conversion failure

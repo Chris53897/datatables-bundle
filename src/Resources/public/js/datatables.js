@@ -88,6 +88,7 @@
                         } else {
                             request._dt = config.name;
 
+                            // SRT:
                             //Try to resolve the original column index when the column was reordered (using the ColReorder plugin)
                             //Only do this when _ColReorder_iOrigCol is available
                             if (settings.aoColumns && settings.aoColumns.length && settings.aoColumns[0]._ColReorder_iOrigCol !== undefined) {

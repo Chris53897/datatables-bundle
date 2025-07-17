@@ -174,7 +174,12 @@ class DataTable
         if (!$column instanceof AbstractColumn) {
             $column = is_int($column) ? $this->getColumn($column) : $this->getColumnByName((string) $column);
         }
-        $this->options['order'][] = [$column->getIndex(), $direction];
+
+        # https://github.com/omines/datatables-bundle/pull/389/files
+        if (false !== $this->getOption('ordering')) {
+            $direction = self::SORT_ASCENDING === $direction ? self::SORT_ASCENDING : self::SORT_DESCENDING;
+            $this->options['order'][] = [$column->getIndex(), $direction];
+        }
 
         return $this;
     }

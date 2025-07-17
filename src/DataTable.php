@@ -171,6 +171,8 @@ class DataTable
      */
     public function addOrderBy($column, string $direction = self::SORT_ASCENDING)
     {
+        $direction = mb_strtolower($direction);
+
         if (!$column instanceof AbstractColumn) {
             $column = is_int($column) ? $this->getColumn($column) : $this->getColumnByName((string) $column);
         }

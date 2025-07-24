@@ -179,6 +179,16 @@ final class DataTableState
         return $this;
     }
 
+
+    public function addOrderBy(AbstractColumn $column, string $direction = DataTable::SORT_ASCENDING): static
+    {
+        $this->orderBy[] = [$column, $direction];
+
+        return $this;
+    }
+
+    /*
+    # TODO sideeffects
     public function addOrderBy(AbstractColumn $column, string $direction = DataTable::SORT_ASCENDING): static
     {
         $direction = mb_strtolower($direction);
@@ -189,7 +199,7 @@ final class DataTableState
         }
 
         return $this;
-    }
+    }*/
 
     /**
      * @return OrderColumn[]
@@ -204,13 +214,22 @@ final class DataTableState
      */
     public function setOrderBy(array $orderBy = []): static
     {
+        $this->orderBy = $orderBy;
+
+        return $this;
+    }
+
+    /**
+    # TODO sideeffects
+    public function setOrderBy(array $orderBy = []): static
+    {
         $this->orderBy = [];
         foreach ($orderBy as [$column, $direction]) {
             $this->addOrderBy($column, $direction);
         }
 
         return $this;
-    }
+    }*/
 
     /**
      * Returns an array of column-level searches.

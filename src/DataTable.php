@@ -165,10 +165,23 @@ class DataTable
         return $this;
     }
 
+
     /**
      * @param int|string|AbstractColumn $column
      * @return $this
      */
+    public function addOrderBy($column, string $direction = self::SORT_ASCENDING)
+    {
+        if (!$column instanceof AbstractColumn) {
+            $column = is_int($column) ? $this->getColumn($column) : $this->getColumnByName((string) $column);
+        }
+        $this->options['order'][] = [$column->getIndex(), $direction];
+
+        return $this;
+    }
+
+    /**
+    # sideeffects
     public function addOrderBy($column, string $direction = self::SORT_ASCENDING)
     {
         $direction = mb_strtolower($direction);
@@ -185,6 +198,7 @@ class DataTable
 
         return $this;
     }
+     */
 
     /**
      * @param array<string, mixed> $options

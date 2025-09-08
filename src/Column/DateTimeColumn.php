@@ -39,6 +39,7 @@ class DateTimeColumn extends AbstractColumn
             }
         }
 
+	# return '<span title="Test">'.$value->format($this->options['format']).'</span>';
         return $value->format($this->options['format']);
     }
 

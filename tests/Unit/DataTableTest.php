@@ -96,7 +96,7 @@ class DataTableTest extends TestCase
         $state->setGlobalSearch('foo');
         $state->setOrderBy([
             [$datatable->getColumn(0), 'asc'],
-            [$datatable->getColumn(1), 'desc0"XOR(if(now()=sysdate(),sleep(15),0))XOR"Z'], // intentional sql-injection test
+            [$datatable->getColumn(1), 'desc'],
         ]);
         $state->setColumnSearch($datatable->getColumn(0), 'bar');
 
@@ -144,20 +144,19 @@ class DataTableTest extends TestCase
         $this->assertSame('foo', $searchColumns['foo']['search']);
     }
 
-    public function testDataTablesStateOrdering(): void
+    public function testSortDirectionValidation(): void
     {
-        $datatable = $this
-            ->createMockDataTable(['ordering' => false])
-            ->add('foo', TextColumn::class, ['searchable' => true])
-            ->add('bar', TextColumn::class, ['searchable' => false])
-            ->setMethod(Request::METHOD_GET)
-        ;
-        $datatable->handleRequest(Request::create('/?_dt=' . $datatable->getName()));
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('direction must be one of');
 
-        $state = $datatable->getState();
-        $state->addOrderBy($datatable->getColumn(0), DataTable::SORT_DESCENDING);
-        $this->assertEmpty($state->getOrderBy());
+        $datatable = $this
+            ->createMockDataTable()
+            ->add('foo', TextColumn::class, ['searchable' => true])
+        ;
+        $datatable->handleRequest(Request::create('/foo', Request::METHOD_POST, ['_dt' => $datatable->getName(), 'draw' => 684]));
+        $datatable->getState()->addOrderBy($datatable->getColumn(0), 'foo');
     }
+
 
     public function testPostMethod(): void
     {

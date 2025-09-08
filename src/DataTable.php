@@ -57,9 +57,10 @@ class DataTable
         'fixedHeader' => false,
     ];
 
-    public const DEFAULT_TEMPLATE = '@DataTables/datatable_html.html.twig';
-    public const SORT_ASCENDING = 'asc';
-    public const SORT_DESCENDING = 'desc';
+    public const string DEFAULT_TEMPLATE = '@DataTables/datatable_html.html.twig';
+    public const string SORT_ASCENDING = 'asc';
+    public const string SORT_DESCENDING = 'desc';
+    public const array SORT_OPTIONS = [self::SORT_ASCENDING, self::SORT_DESCENDING];
 
     protected ?AdapterInterface $adapter = null;
 
@@ -165,7 +166,6 @@ class DataTable
         return $this;
     }
 
-
     /**
      * @param int|string|AbstractColumn $column
      * @return $this
@@ -174,6 +174,10 @@ class DataTable
     {
         if (!$column instanceof AbstractColumn) {
             $column = is_int($column) ? $this->getColumn($column) : $this->getColumnByName((string) $column);
+        }
+        $direction = mb_strtolower($direction);
+        if (!in_array($direction, self::SORT_OPTIONS, true)) {
+            throw new \InvalidArgumentException(sprintf('Sort direction must be one of %s', implode(', ', self::SORT_OPTIONS)));
         }
         $this->options['order'][] = [$column->getIndex(), $direction];
 

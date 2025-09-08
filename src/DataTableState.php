@@ -92,8 +92,12 @@ final class DataTableState
         if ($parameters->has('order')) {
             $this->orderBy = [];
             foreach ($parameters->all()['order'] ?? [] as $order) {
-                $column = $this->getDataTable()->getColumn((int) $order['column']);
-                $this->addOrderBy($column, $order['dir'] ?? DataTable::SORT_ASCENDING);
+                try {
+                    $column = $this->getDataTable()->getColumn((int) $order['column']);
+                    $this->addOrderBy($column, $order['dir'] ?? DataTable::SORT_ASCENDING);
+                } catch (\Throwable $t) {
+                    // Column index and direction can be corrupted by malicious clients, ignore any exceptions thus caused
+                }
             }
         }
     }
@@ -179,27 +183,16 @@ final class DataTableState
         return $this;
     }
 
-
     public function addOrderBy(AbstractColumn $column, string $direction = DataTable::SORT_ASCENDING): static
     {
+        $direction = mb_strtolower($direction);
+        if (!in_array($direction, DataTable::SORT_OPTIONS, true)) {
+            throw new \InvalidArgumentException(sprintf('Sort direction must be one of %s', implode(', ', DataTable::SORT_OPTIONS)));
+        }
         $this->orderBy[] = [$column, $direction];
 
         return $this;
     }
-
-    /*
-    # TODO sideeffects
-    public function addOrderBy(AbstractColumn $column, string $direction = DataTable::SORT_ASCENDING): static
-    {
-        $direction = mb_strtolower($direction);
-
-        if (false !== $this->dataTable->getOption('ordering')) {
-            $direction = DataTable::SORT_ASCENDING === $direction ? DataTable::SORT_ASCENDING : DataTable::SORT_DESCENDING;
-            $this->orderBy[] = [$column, $direction];
-        }
-
-        return $this;
-    }*/
 
     /**
      * @return OrderColumn[]
@@ -214,22 +207,13 @@ final class DataTableState
      */
     public function setOrderBy(array $orderBy = []): static
     {
-        $this->orderBy = $orderBy;
-
-        return $this;
-    }
-
-    /**
-    # TODO sideeffects
-    public function setOrderBy(array $orderBy = []): static
-    {
         $this->orderBy = [];
         foreach ($orderBy as [$column, $direction]) {
             $this->addOrderBy($column, $direction);
         }
 
         return $this;
-    }*/
+    }
 
     /**
      * Returns an array of column-level searches.
